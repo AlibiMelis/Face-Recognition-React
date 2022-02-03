@@ -8,11 +8,6 @@ import Register from "./components/Register/Register";
 import Rank from "./components/Rank/Rank";
 import Particles from "react-tsparticles";
 import { Component } from "react/cjs/react.production.min";
-import Clarifai from "clarifai";
-
-const app = new Clarifai.App({
-  apiKey: process.env.REACT_APP_CLARIFAI_API,
-});
 
 const particleOptions = {
   fpsLimit: 80,
@@ -35,7 +30,7 @@ const particleOptions = {
       enable: true,
       outMode: "bounce",
       random: false,
-      speed: 2,
+      speed: 1,
       straight: false,
     },
     number: {
@@ -59,23 +54,24 @@ const particleOptions = {
   detectRetina: true,
 };
 
+const initialState = {
+  input: "",
+  imageUrl: "",
+  box: {},
+  route: "signIn",
+  isSignedIn: false,
+  user: {
+    id: "",
+    name: "",
+    email: "",
+    entries: 0,
+    joined: "",
+  },
+};
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      input: "",
-      imageUrl: "",
-      box: {},
-      route: "signIn",
-      isSignedIn: false,
-      user: {
-        id: "",
-        name: "",
-        email: "",
-        entries: 0,
-        joined: "",
-      },
-    };
+    this.state = initialState;
   }
 
   onInputChange = (event) => {
@@ -115,19 +111,24 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-    app.models
-      .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
+    fetch("https://blooming-springs-64749.herokuapp.com/imageurl", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageurl: this.state.input }),
+    })
+      .then((response) => response.json())
       .then((response) => {
         if (response) {
-          fetch("http://localhost:3000/image", {
+          fetch("https://blooming-springs-64749.herokuapp.com/image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: this.state.user.id }),
           })
             .then((response) => response.json())
             .then((count) => {
-              this.setState(Object.assign(this.state.user, { entries: count}));
-            });
+              this.setState(Object.assign(this.state.user, { entries: count }));
+            })
+            .catch(console.log);
         }
         this.displayBox(this.calculateFaceLocation(response));
       })
@@ -136,11 +137,12 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === "home") {
-      this.setState({ isSignedIn: true });
+      this.setState({ isSignedIn: true, route: "home" });
+    } else if (route === "signOut") {
+      this.setState(initialState);
     } else {
-      this.setState({ isSignedIn: false });
+      this.setState({ route: route });
     }
-    this.setState({ route: route });
   };
 
   render() {
@@ -151,7 +153,7 @@ class App extends Component {
           onRouteChange={this.onRouteChange}
           isSignedIn={this.state.isSignedIn}
         />
-        {/* <Particles className="particles" options={particleOptions} /> */}
+        <Particles className="particles" options={particleOptions} />
         {this.state.route === "home" ? (
           <div>
             <Logo />
