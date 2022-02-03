@@ -68,11 +68,30 @@ class App extends Component {
       box: {},
       route: "signIn",
       isSignedIn: false,
+      user: {
+        id: "",
+        name: "",
+        email: "",
+        entries: 0,
+        joined: "",
+      },
     };
   }
 
   onInputChange = (event) => {
     this.setState({ input: event.target.value });
+  };
+
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined,
+      },
+    });
   };
 
   calculateFaceLocation = (data) => {
@@ -98,28 +117,48 @@ class App extends Component {
     this.setState({ imageUrl: this.state.input });
     app.models
       .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then((response) => this.displayBox(this.calculateFaceLocation(response)))
+      .then((response) => {
+        if (response) {
+          fetch("http://localhost:3000/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: this.state.user.id }),
+          })
+            .then((response) => response.json())
+            .then((count) => {
+              this.setState(Object.assign(this.state.user, { entries: count}));
+            });
+        }
+        this.displayBox(this.calculateFaceLocation(response));
+      })
       .catch((err) => console.log(err));
   };
 
   onRouteChange = (route) => {
-    if (route === 'home') {
-      this.setState({isSignedIn: true});
+    if (route === "home") {
+      this.setState({ isSignedIn: true });
     } else {
-      this.setState({isSignedIn: false});
+      this.setState({ isSignedIn: false });
     }
-    this.setState({route: route});
-  }
+    this.setState({ route: route });
+  };
 
   render() {
+    console.log("app", this.state.user);
     return (
       <div className="App">
-        <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn}/>
-        <Particles className="particles" options={particleOptions} />
+        <Navigation
+          onRouteChange={this.onRouteChange}
+          isSignedIn={this.state.isSignedIn}
+        />
+        {/* <Particles className="particles" options={particleOptions} /> */}
         {this.state.route === "home" ? (
           <div>
             <Logo />
-            <Rank />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+            />
             <InputForm
               onInputChange={this.onInputChange}
               onButtonSubmit={this.onButtonSubmit}
@@ -129,10 +168,13 @@ class App extends Component {
               box={this.state.box}
             />
           </div>
+        ) : this.state.route === "signIn" ? (
+          <SignIn onRouteChange={this.onRouteChange} loadUser={this.loadUser} />
         ) : (
-          this.state.route === "signIn"
-          ? <SignIn onRouteChange={this.onRouteChange}/>
-          : <Register onRouteChange={this.onRouteChange} />
+          <Register
+            onRouteChange={this.onRouteChange}
+            loadUser={this.loadUser}
+          />
         )}
       </div>
     );
