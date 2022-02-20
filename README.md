@@ -1,6 +1,6 @@
 # Face-Recognition-frontend
 This repository is the UI (written using React) of the website, which can recognise faces on images. <br/>
-The back-end of the website can be found <a href='https://github.com/AlibiMelis/Face-Recognition-backend'>here</a>.
+The <b>back-end</b> of the website can be found <a href='https://github.com/AlibiMelis/Face-Recognition-backend'>here</a>.
 
 The website is deployed on Heroku. Check it out: https://smart-brain-lb.herokuapp.com
 
