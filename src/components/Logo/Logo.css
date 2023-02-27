@@ -1,3 +1,12 @@
 .Tilt {
-  background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+  background: linear-gradient(43deg, #4158d0 0%, #c850c0 46%, #ffcc70 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Tilt > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
