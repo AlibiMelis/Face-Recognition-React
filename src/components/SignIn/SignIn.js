@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { endpoint } from "../../App";
 
 class SignIn extends Component {
   constructor() {
@@ -17,7 +18,7 @@ class SignIn extends Component {
   };
 
   onSubmitSignIn = (event) => {
-    fetch("https://blooming-springs-64749.herokuapp.com/signin", {
+    fetch(`${endpoint}/signin`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",

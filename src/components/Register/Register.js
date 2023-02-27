@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { endpoint } from "../../App";
 
 class Register extends Component {
   constructor() {
@@ -21,7 +22,7 @@ class Register extends Component {
   };
 
   onSubmitRegister = (event) => {
-    fetch("https://blooming-springs-64749.herokuapp.com/register", {
+    fetch(`${endpoint}/register`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",

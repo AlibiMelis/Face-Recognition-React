@@ -111,7 +111,7 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-    fetch("https://blooming-springs-64749.herokuapp.com/imageurl", {
+    fetch(`${endpoint}/imageurl`, {
       method: "post",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageurl: this.state.input }),
@@ -119,7 +119,7 @@ class App extends Component {
       .then((response) => response.json())
       .then((response) => {
         if (response) {
-          fetch("https://blooming-springs-64749.herokuapp.com/image", {
+          fetch(`${endpoint}/image`, {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: this.state.user.id }),
@@ -184,3 +184,4 @@ class App extends Component {
 }
 
 export default App;
+export const endpoint = 'https://face-recognition-server-3x5o.onrender.com';
